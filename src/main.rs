@@ -1,5 +1,5 @@
-use lc::term::*;
 use lc::eval::*;
+use lc::term::*;
 
 /// Driver code to run the lambda calculus evaluator.
 fn main() {

@@ -4,23 +4,36 @@ use std::collections::HashSet;
 /// Evaluates a term:
 /// In order to simplify the term as much as possible, we use a call-by-value strategy.
 /// We even evaluate the body of an abstraction eagerly.
-/// 
+///
 /// The evaluation rules are as follows:
 /// - A variable evaluates to itself.
 /// - An abstraction evaluates to itself, even the body is eagerly evaluated.
-/// - An application evaluates the left side, then the right side, 
+/// - An application evaluates the left side, then the right side,
 ///   and applies the left side to the right side by substitution.
-///   Examples: 
+///   Examples:
 ///   `x` evaluates to `x`.
 ///   `λx. x` evaluates to `λx. x`.
 ///   `(λx. x) y` evaluates to `y`.
 ///   `(λx. (λy. x)) z` evaluates to `λy. z`.
 ///   `(λx. (λy. x)) a b` evaluates to `a`.
 pub fn eval(term: &Term) -> Term {
-    term.clone()
     // TODO: "Implement the eval function")
-}
+    match term {
+        Term::Var(_) => term.clone(),
+        Term::Abs(_, _) => term.clone(),
+        Term::App(t1, t2) => {
+            let left_term = eval(t1);
+            let right_term = eval(t2);
 
+            //subst right into left
+            match left_term {
+                Term::Var(_) => left_term.clone(),
+                Term::Abs(param, body) => eval(&substitute(&body, &param, &right_term)),
+                Term::App(_, _) => eval(&left_term),
+            }
+        }
+    }
+}
 
 /// Replace all occurrences of a variable `var` in a `term` with `replacement`.
 pub fn substitute(term: &Term, var: &str, replacement: &Term) -> Term {
